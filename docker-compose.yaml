@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   bot:
-    image: node:14.15.1-buster
+    image: node:16.6.0-buster
     volumes:
       - .:/app
       - ~/.aws:/root/.aws
