@@ -3,11 +3,14 @@ version: "3.7"
 services:
   bot:
     image: node:16.6.0-buster
+    user: node
     volumes:
       - .:/app
-      - ~/.aws:/root/.aws
+      - ~/.aws:/home/node/.aws
     working_dir: /app
     environment:
-      ENV: development
+      AWS_REGION: us-east-2
+      AWS_PROFILE: tt-staging
+      DISCORD_BOT_SECRETS_PATH: /turntable/staging/jwt-secret
 
     command: bash -c "npm start"

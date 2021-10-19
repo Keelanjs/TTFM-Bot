@@ -1,6 +1,13 @@
 import { Client, Intents, Message } from "discord.js";
 
-void (() => {
+import { discordBotSecretsPath } from "./const";
+import { getAWSSecrets } from "./utils/getAWSSecrets";
+
+void (async () => {
+  const response = await getAWSSecrets<{ discordtoken: string }>(
+    discordBotSecretsPath
+  );
+
   const client = new Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
   });
@@ -13,5 +20,5 @@ void (() => {
     console.log("messageCreate", message);
   });
 
-  client.login("token");
+  client.login(response.discordtoken);
 })();

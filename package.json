@@ -14,6 +14,7 @@
     "typescript": "^4.4.4"
   },
   "dependencies": {
+    "aws-sdk": "^2.1010.0",
     "discord.js": "^13.2.0"
   }
 }
