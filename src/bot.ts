@@ -1,12 +1,26 @@
+import { Socket } from "socket.io-client";
+import { Song } from "./types";
+import { fetchSpotifyPlaylist } from "./utils/fetchSpotifyPlaylist";
 import { getRoomConfigForClient } from "./utils/getRoomConfigForClient";
 
 export class Bot {
   private readonly io: any;
+  private spotifyRefreshToken: string = "";
+  private spotifyCredentials: string = "";
   public accessToken: string = "";
+  private songs: Song[] = [];
+  private socket: Socket | undefined = undefined;
 
-  private constructor(io, accessToken: string) {
+  private constructor(
+    io,
+    accessToken: string,
+    spotifyRefreshToken: string,
+    spotifyCredentials: string
+  ) {
     this.io = io;
     this.accessToken = accessToken;
+    this.spotifyRefreshToken = spotifyRefreshToken;
+    this.spotifyCredentials = spotifyCredentials;
   }
 
   public async connectToRoom(
@@ -26,8 +40,18 @@ export class Bot {
     );
   }
 
-  public static async createBot(io, accessToken: string): Promise<Bot> {
-    const _bot = new Bot(io, accessToken);
+  public static async createBot(
+    io,
+    accessToken: string,
+    spotifyRefreshToken: string,
+    spotifyCredentials: string
+  ): Promise<Bot> {
+    const _bot = new Bot(
+      io,
+      accessToken,
+      spotifyRefreshToken,
+      spotifyCredentials
+    );
     return _bot;
   }
 
@@ -50,13 +74,53 @@ export class Bot {
 
     return new Promise((resolve, _reject) => {
       socket.on("connect", () => {
-        console.info("connected in client");
+        console.info("Connected in client");
+        this.socket = socket;
         resolve({ connected: true });
       });
 
       socket.on("connect_error", (error: Error) => {
         console.log({ msg: "Error in Bot.connect", error });
       });
+    });
+  }
+
+  private getSongsFromPlaylist(playlist): Song[] {
+    const songs = playlist.tracks.items.map((item) => {
+      const song: Song = {
+        artistName: item["track"]["artists"][0]["name"],
+        duration: Math.floor(item["track"]["duration_ms"] / 1000),
+        genre: "",
+        id: "spotify:track:" + item["track"]["id"],
+        isrc: item["track"]["external_ids"]["isrc"],
+        musicProvider: "spotify",
+        trackName: item["track"]["name"],
+        trackUrl: "",
+      };
+
+      return song;
+    });
+
+    return songs;
+  }
+
+  public async playPlaylist(
+    playlistId: string,
+    DjSeatNumber: string
+  ): Promise<void> {
+    const playlist = await fetchSpotifyPlaylist(
+      playlistId,
+      this.spotifyRefreshToken,
+      this.spotifyCredentials
+    );
+
+    this.songs = this.getSongsFromPlaylist(playlist);
+
+    this.socket?.emit("takeDjSeat", {
+      avatarId: "5",
+      djSeatKey: Number(DjSeatNumber),
+      nextTrack: { song: this.songs[0] },
+      nickname: "Dj",
     });
   }
 }

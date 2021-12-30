@@ -11,6 +11,8 @@ void (async () => {
   const secrets = await getAWSSecrets<{
     discord_token: string;
     auth_bot_token: string;
+    spotify_refresh_token: string;
+    spotify_credentials: string;
   }>(discordBotSecretsPath);
 
   const client = new Client({
@@ -20,7 +22,12 @@ void (async () => {
   const bots = {};
 
   for (let i = 0; i < botInstancesCount; i++) {
-    const bot = await Bot.createBot(io, secrets.auth_bot_token);
+    const bot = await Bot.createBot(
+      io,
+      secrets.auth_bot_token,
+      secrets.spotify_refresh_token,
+      secrets.spotify_credentials
+    );
     bots[i] = bot;
   }
 
@@ -51,6 +58,24 @@ void (async () => {
           })
           .catch(() => {
             message.reply("Cannot connect");
+          });
+        break;
+
+      case BotMessages.PLAY_PLAYLIST:
+        if (!args || !args[0] || !args[1] || !args[2]) {
+          message.reply("Invalid command");
+          return;
+        }
+        message.reply("Fetching playlist...");
+
+        const [bnumber, playlistId, DjSeatNumber] = args;
+        bots[bnumber]
+          .playPlaylist(playlistId, DjSeatNumber)
+          .then(() => {
+            message.reply(`Playing playlist to ${playlistId}`);
+          })
+          .catch(() => {
+            message.reply("Cannot play");
           });
         break;
 
