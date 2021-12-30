@@ -12,6 +12,6 @@ services:
       AWS_REGION: us-east-2
       AWS_PROFILE: tt-staging
       DISCORD_BOT_SECRETS_PATH: /turntable/staging/jwt-secret
-      ROOMS_SERVICE_API_BASE_URL: https://rooms.prod.tt.fm
+      ROOMS_SERVICE_API_BASE_URL: https://rooms.staging.tt.fm
 
     command: bash -c "npm start"

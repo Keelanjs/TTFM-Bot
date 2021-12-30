@@ -1,16 +1,17 @@
 import { Client, Intents, Message } from "discord.js";
 import io from "socket.io-client";
 
-import { accessToken, botInstancesCount, discordBotSecretsPath } from "./const";
+import { botInstancesCount, discordBotSecretsPath } from "./const";
 import { getAWSSecrets } from "./utils/getAWSSecrets";
 import { Bot } from "./bot";
 import { getArgsFromMessage } from "./utils/getArgsFromMessage";
 import { BotMessages } from "./types";
 
 void (async () => {
-  const response = await getAWSSecrets<{ discordtoken: string }>(
-    discordBotSecretsPath
-  );
+  const response = await getAWSSecrets<{
+    discordtoken: string;
+    discord_bot_token: string;
+  }>(discordBotSecretsPath);
 
   const client = new Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
@@ -19,7 +20,7 @@ void (async () => {
   const bots = {};
 
   for (let i = 0; i < botInstancesCount; i++) {
-    const bot = await Bot.createBot(io, accessToken);
+    const bot = await Bot.createBot(io, response.discord_bot_token);
     bots[i] = bot;
   }
 
