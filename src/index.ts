@@ -8,9 +8,9 @@ import { getArgsFromMessage } from "./utils/getArgsFromMessage";
 import { BotMessages } from "./types";
 
 void (async () => {
-  const response = await getAWSSecrets<{
-    discordtoken: string;
-    discord_bot_token: string;
+  const secrets = await getAWSSecrets<{
+    discord_token: string;
+    auth_bot_token: string;
   }>(discordBotSecretsPath);
 
   const client = new Client({
@@ -20,7 +20,7 @@ void (async () => {
   const bots = {};
 
   for (let i = 0; i < botInstancesCount; i++) {
-    const bot = await Bot.createBot(io, response.discord_bot_token);
+    const bot = await Bot.createBot(io, secrets.auth_bot_token);
     bots[i] = bot;
   }
 
@@ -59,5 +59,5 @@ void (async () => {
     }
   });
 
-  client.login(response.discordtoken);
+  client.login(secrets.discord_token);
 })();
