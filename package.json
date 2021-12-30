@@ -15,6 +15,8 @@
   },
   "dependencies": {
     "aws-sdk": "^2.1010.0",
-    "discord.js": "^13.2.0"
+    "discord.js": "^13.2.0",
+    "node-fetch": "^2.6.5",
+    "socket.io-client": "^4.4.0"
   }
 }
