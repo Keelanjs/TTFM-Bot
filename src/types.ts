@@ -2,6 +2,7 @@ export enum BotMessages {
   CONNECT = "connect",
   PLAY_PLAYLIST = "playplaylist",
   LEAVE_DJ_SEAT = "leavedj",
+  DISCONNECT = "disconnect",
 }
 
 export type Song = {

@@ -39,23 +39,6 @@ export class Bot {
     this.botUuid = botUuid;
   }
 
-  public async connectToRoom(
-    roomSlug: string,
-    roomPassword: string | null
-  ): Promise<void> {
-    const roomConfig = await getRoomConfigForClient(roomSlug, this.accessToken);
-
-    if (!roomConfig) {
-      return;
-    }
-
-    await this.connect(
-      roomConfig.socketDomain,
-      roomConfig.socketPath,
-      roomPassword
-    );
-  }
-
   public static async createBot(
     io,
     accessToken: string,
@@ -74,6 +57,10 @@ export class Bot {
     );
 
     return _bot;
+  }
+
+  private async delay(delay: number) {
+    return new Promise((resolve) => setTimeout(resolve, delay));
   }
 
   private setPlayNextSongListener(socket: Socket): void {
@@ -164,6 +151,24 @@ export class Bot {
     });
   }
 
+  private async close(): Promise<boolean> {
+    return new Promise((resolveClose, _reject) => {
+      this.socket?.on("disconnect", () => {
+        resolveClose(true);
+        this.socket = undefined;
+        console.log("Connection closed");
+      });
+
+      if (!this.socket) {
+        return;
+      }
+
+      this.socket.io.reconnection(false);
+      this.socket.close();
+      this.io.Socket.close();
+    });
+  }
+
   private sendNextTrackToPlay() {
     const song = this.songs[Math.floor(Math.random() * this.songs.length)];
 
@@ -204,6 +209,34 @@ export class Bot {
       djSeatKey: this.djSeatNumber,
       nextTrack: { song: this.songs[0] },
     });
+  }
+
+  public async connectToRoom(
+    roomSlug: string,
+    roomPassword: string | null
+  ): Promise<void> {
+    this.disconnectFromRoom();
+    const roomConfig = await getRoomConfigForClient(roomSlug, this.accessToken);
+
+    if (!roomConfig) {
+      return;
+    }
+
+    await this.connect(
+      roomConfig.socketDomain,
+      roomConfig.socketPath,
+      roomPassword
+    );
+  }
+
+  public async disconnectFromRoom(): Promise<boolean> {
+    this.leaveDjSeat();
+
+    await this.delay(1000);
+
+    const isClosed = await this.close();
+
+    return isClosed;
   }
 
   public async playPlaylist(

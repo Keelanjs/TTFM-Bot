@@ -8,6 +8,7 @@ import { onConnectHandler } from "./commandsHandlers/onConnectHandler";
 import { createBots } from "./utils/createBots";
 import { onPlayPlaylistHandler } from "./commandsHandlers/onPlayPlaylistHandler";
 import { onLeaveDjSeatHandler } from "./commandsHandlers/onLeaveDjSeatHandler";
+import { onDisconnectHandler } from "./commandsHandlers/onDisconnectHandler";
 
 void (async () => {
   const { discord_token } = await getAWSSecrets<{
@@ -30,6 +31,10 @@ void (async () => {
     switch (command) {
       case BotMessages.CONNECT:
         onConnectHandler(bots, message, args);
+        break;
+
+      case BotMessages.DISCONNECT:
+        onDisconnectHandler(bots, message, args);
         break;
 
       case BotMessages.PLAY_PLAYLIST:
