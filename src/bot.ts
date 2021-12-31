@@ -1,4 +1,5 @@
 import { Socket, io } from "socket.io-client";
+import { BotState } from "./botState";
 
 import {
   IInitialStateReceived,
@@ -20,12 +21,9 @@ export class Bot {
   private spotifyCredentials: string;
   private avatarId: string;
   private botUuid: string;
-
-  private songs: Song[] = [];
   private socket: Socket | undefined;
-  private playingUserUuids: (string | null)[] | [] = [];
-  private djSeatNumber: number | null = null;
-  public roomSlug: string | undefined;
+
+  public botState: BotState;
 
   private constructor(
     io: Io,
@@ -33,7 +31,8 @@ export class Bot {
     spotifyRefreshToken: string,
     spotifyCredentials: string,
     avatarId: string,
-    botUuid: string
+    botUuid: string,
+    botState: BotState
   ) {
     this.io = io;
     this.accessToken = accessToken;
@@ -41,6 +40,7 @@ export class Bot {
     this.spotifyCredentials = spotifyCredentials;
     this.avatarId = avatarId;
     this.botUuid = botUuid;
+    this.botState = botState;
   }
 
   public static async createBot(
@@ -49,7 +49,8 @@ export class Bot {
     spotifyRefreshToken: string,
     spotifyCredentials: string,
     avatarId: string,
-    botUuid: string
+    botUuid: string,
+    botState: BotState
   ): Promise<Bot> {
     const _bot = new Bot(
       io,
@@ -57,7 +58,8 @@ export class Bot {
       spotifyRefreshToken,
       spotifyCredentials,
       avatarId,
-      botUuid
+      botUuid,
+      botState
     );
 
     return _bot;
@@ -77,9 +79,7 @@ export class Bot {
     socket.on(
       SocketMessages.sendInitialState,
       (state: IInitialStateReceived) => {
-        this.playingUserUuids = state.djSeats.value
-          .map((item) => item[1].userUuid)
-          .filter((a) => a);
+        this.botState.setInitialState(state);
 
         this.takeOrLeaveDjSeat();
       }
@@ -88,7 +88,7 @@ export class Bot {
 
   private setTakeDjSeatListener(socket: Socket): void {
     socket.on(SocketMessages.takeDjSeat, (msg: ITakeDjSeat) => {
-      this.playingUserUuids = [...this.playingUserUuids, msg.userUuid];
+      this.botState.addNewPlayingDj(msg);
 
       this.takeOrLeaveDjSeat();
     });
@@ -96,23 +96,21 @@ export class Bot {
 
   private setLeaveDjSeatListener(socket: Socket): void {
     socket.on(SocketMessages.leaveDjSeat, (msg: ILeaveDjSeat) => {
-      this.playingUserUuids = this.playingUserUuids.filter(
-        (item) => item !== msg.userUuid
-      );
+      this.botState.removePlayingDj(msg);
 
       this.takeOrLeaveDjSeat();
     });
   }
 
   private takeOrLeaveDjSeat(): void {
-    const playingDjs = this.playingUserUuids.filter(
-      (item) => item !== this.botUuid
+    const shouldStayOnStage = this.botState.checkIfShouldStayOnStage(
+      this.botUuid
     );
 
-    if (playingDjs.length > 0) {
-      this.socket?.emit(SocketMessages.leaveDjSeat, { userUuid: this.botUuid });
-    } else {
+    if (shouldStayOnStage) {
       this.takeDjSeat();
+    } else {
+      this.socket?.emit(SocketMessages.leaveDjSeat, { userUuid: this.botUuid });
     }
   }
 
@@ -173,7 +171,7 @@ export class Bot {
   }
 
   private sendNextTrackToPlay(): void {
-    const song = this.songs[Math.floor(Math.random() * this.songs.length)];
+    const song = this.botState.getRandomSong();
 
     if (!song) {
       return;
@@ -209,8 +207,8 @@ export class Bot {
   private takeDjSeat(): void {
     this.socket?.emit(SocketMessages.takeDjSeat, {
       avatarId: this.avatarId,
-      djSeatKey: this.djSeatNumber,
-      nextTrack: { song: this.songs[0] },
+      djSeatKey: this.botState.djSeatNumber,
+      nextTrack: { song: this.botState.songs[0] },
     });
   }
 
@@ -231,7 +229,7 @@ export class Bot {
       roomPassword
     );
 
-    this.roomSlug = roomSlug;
+    this.botState.setRoomSlug(roomSlug);
   }
 
   public async disconnectFromRoom(): Promise<boolean> {
@@ -239,7 +237,7 @@ export class Bot {
     await this.delay(1000);
 
     const isClosed = await this.close();
-    this.roomSlug = undefined;
+    this.botState.setRoomSlug(undefined);
 
     return isClosed;
   }
@@ -260,8 +258,10 @@ export class Bot {
       return;
     }
 
-    this.songs = this.getSongsFromPlaylist(playlist);
-    this.djSeatNumber = Number(djSeatNumber);
+    const songs = this.getSongsFromPlaylist(playlist);
+    this.botState.setSongs(songs);
+
+    this.botState.setDjSeatNumber(djSeatNumber);
 
     this.takeOrLeaveDjSeat();
 
@@ -269,7 +269,7 @@ export class Bot {
   }
 
   public async leaveDjSeat(): Promise<void> {
-    this.djSeatNumber = null;
+    this.botState.setDjSeatNumber(null);
     this.socket?.emit(SocketMessages.leaveDjSeat, { userUuid: this.botUuid });
   }
 }

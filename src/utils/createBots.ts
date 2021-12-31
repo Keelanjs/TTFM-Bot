@@ -1,6 +1,7 @@
 import { io } from "socket.io-client";
 
 import { Bot } from "../bot";
+import { BotState } from "../botState";
 import { discordBotSecretsPath } from "../const";
 import { getAWSSecrets } from "./getAWSSecrets";
 import { getUserProfile } from "./getUserProfile";
@@ -27,7 +28,8 @@ export const createBots = async (botInstancesCount: number): Promise<IBots> => {
       secrets.spotify_refresh_token,
       secrets.spotify_credentials,
       profile.avatarId,
-      profile.uuid
+      profile.uuid,
+      new BotState()
     );
     bots[i] = bot;
   }
