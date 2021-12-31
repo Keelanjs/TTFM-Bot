@@ -68,6 +68,16 @@ export class Bot {
     return _bot;
   }
 
+  private setPlayNextSongListener(socket: Socket): void {
+    socket.on(SocketMessages.playNextSong, () => {
+      this.sendNextTrackToPlay();
+    });
+  }
+
+  private configureListeners(socket: Socket) {
+    this.setPlayNextSongListener(socket);
+  }
+
   public async connect(
     socketDomain: string,
     socketPath: string,
@@ -85,6 +95,8 @@ export class Bot {
       },
     });
 
+    this.configureListeners(socket);
+
     return new Promise((resolve, _reject) => {
       socket.on("connect", () => {
         console.info("Connected in client");
@@ -98,16 +110,31 @@ export class Bot {
     });
   }
 
+  private sendNextTrackToPlay() {
+    const song = this.songs[Math.floor(Math.random() * this.songs.length)];
+
+    if (!song) {
+      return;
+    }
+
+    const nextTrack = {
+      song,
+      trackUrl: "",
+    };
+
+    this.socket?.emit(SocketMessages.sendNextTrackToPlay, nextTrack);
+  }
+
   private getSongsFromPlaylist(playlist): Song[] {
     const songs = playlist.tracks.items.map((item) => {
       const song: Song = {
-        artistName: item["track"]["artists"][0]["name"],
-        duration: Math.floor(item["track"]["duration_ms"] / 1000),
+        artistName: item.track.artists[0].name,
+        duration: Math.floor(item.track.duration_ms / 1000),
         genre: "",
-        id: "spotify:track:" + item["track"]["id"],
-        isrc: item["track"]["external_ids"]["isrc"],
+        id: "spotify:track:" + item.track.id,
+        isrc: item.track.external_ids.isrc,
         musicProvider: "spotify",
-        trackName: item["track"]["name"],
+        trackName: item.track.name,
         trackUrl: "",
       };
 
@@ -134,5 +161,7 @@ export class Bot {
       djSeatKey: Number(DjSeatNumber),
       nextTrack: { song: this.songs[0] },
     });
+
+    this.sendNextTrackToPlay();
   }
 }
