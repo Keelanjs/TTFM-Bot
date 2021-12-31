@@ -29,3 +29,30 @@ export enum SocketMessages {
   userDisconnected = "user:disconnected",
   wrongMessagePayload = "wrongMessagePayload",
 }
+
+export type ValueMapWrapper<K, T> = {
+  dataType: "Map";
+  value: [K, T][];
+};
+
+export type DjSeat = {
+  avatarId: string | null;
+  isBot: boolean;
+  isPlaying: boolean;
+  isReconnecting: boolean;
+  nextTrack: { song: Song } | null;
+  userUuid: string | null;
+  roomServerUserId: number | null;
+};
+
+export interface IInitialStateReceived {
+  djSeats: ValueMapWrapper<number, DjSeat>;
+}
+
+export interface ITakeDjSeat {
+  userUuid: string;
+}
+
+export interface ILeaveDjSeat {
+  userUuid: string;
+}

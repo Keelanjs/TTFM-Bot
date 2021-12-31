@@ -1,6 +1,12 @@
 import { Socket } from "socket.io-client";
 
-import { SocketMessages, Song } from "./types";
+import {
+  IInitialStateReceived,
+  ILeaveDjSeat,
+  ITakeDjSeat,
+  SocketMessages,
+  Song,
+} from "./types";
 import { fetchSpotifyPlaylist } from "./utils/fetchSpotifyPlaylist";
 import { getRoomConfigForClient } from "./utils/getRoomConfigForClient";
 
@@ -13,7 +19,9 @@ export class Bot {
   private botUuid: string;
 
   private songs: Song[] = [];
-  private socket: Socket | undefined = undefined;
+  private socket: Socket | undefined;
+  private playingUserUuids: (string | null)[] | [] = [];
+  private djSeatNumber: number | null = null;
 
   private constructor(
     io,
@@ -74,8 +82,54 @@ export class Bot {
     });
   }
 
+  private setSendInitialStateListener(socket: Socket) {
+    socket.on(
+      SocketMessages.sendInitialState,
+      (state: IInitialStateReceived) => {
+        this.playingUserUuids = state.djSeats.value
+          .map((item) => item[1].userUuid)
+          .filter((a) => a);
+
+        this.takeOrLeaveDjSeat();
+      }
+    );
+  }
+
+  private setTakeDjSeatListener(socket: Socket) {
+    socket.on(SocketMessages.takeDjSeat, (msg: ITakeDjSeat) => {
+      this.playingUserUuids = [...this.playingUserUuids, msg.userUuid];
+
+      this.takeOrLeaveDjSeat();
+    });
+  }
+
+  private setLeaveDjSeatListener(socket: Socket) {
+    socket.on(SocketMessages.leaveDjSeat, (msg: ILeaveDjSeat) => {
+      this.playingUserUuids = this.playingUserUuids.filter(
+        (item) => item !== msg.userUuid
+      );
+
+      this.takeOrLeaveDjSeat();
+    });
+  }
+
+  private takeOrLeaveDjSeat() {
+    const playingDjs = this.playingUserUuids.filter(
+      (item) => item !== this.botUuid
+    );
+
+    if (playingDjs.length > 0) {
+      this.socket?.emit(SocketMessages.leaveDjSeat, { userUuid: this.botUuid });
+    } else {
+      this.takeDjSeat();
+    }
+  }
+
   private configureListeners(socket: Socket) {
     this.setPlayNextSongListener(socket);
+    this.setSendInitialStateListener(socket);
+    this.setTakeDjSeatListener(socket);
+    this.setLeaveDjSeatListener(socket);
   }
 
   public async connect(
@@ -144,9 +198,17 @@ export class Bot {
     return songs;
   }
 
+  private takeDjSeat() {
+    this.socket?.emit(SocketMessages.takeDjSeat, {
+      avatarId: this.avatarId,
+      djSeatKey: this.djSeatNumber,
+      nextTrack: { song: this.songs[0] },
+    });
+  }
+
   public async playPlaylist(
     playlistId: string,
-    DjSeatNumber: string
+    djSeatNumber: string
   ): Promise<void> {
     const playlist = await fetchSpotifyPlaylist(
       playlistId,
@@ -155,12 +217,9 @@ export class Bot {
     );
 
     this.songs = this.getSongsFromPlaylist(playlist);
+    this.djSeatNumber = Number(djSeatNumber);
 
-    this.socket?.emit(SocketMessages.takeDjSeat, {
-      avatarId: this.avatarId,
-      djSeatKey: Number(DjSeatNumber),
-      nextTrack: { song: this.songs[0] },
-    });
+    this.takeOrLeaveDjSeat();
 
     this.sendNextTrackToPlay();
   }
