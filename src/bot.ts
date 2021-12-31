@@ -1,5 +1,6 @@
 import { Socket } from "socket.io-client";
-import { Song } from "./types";
+
+import { SocketMessages, Song } from "./types";
 import { fetchSpotifyPlaylist } from "./utils/fetchSpotifyPlaylist";
 import { getRoomConfigForClient } from "./utils/getRoomConfigForClient";
 
@@ -128,7 +129,7 @@ export class Bot {
 
     this.songs = this.getSongsFromPlaylist(playlist);
 
-    this.socket?.emit("takeDjSeat", {
+    this.socket?.emit(SocketMessages.takeDjSeat, {
       avatarId: this.avatarId,
       djSeatKey: Number(DjSeatNumber),
       nextTrack: { song: this.songs[0] },

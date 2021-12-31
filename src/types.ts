@@ -13,3 +13,19 @@ export type Song = {
   trackName: string;
   trackUrl: string;
 };
+
+export enum SocketMessages {
+  takeDjSeat = "takeDjSeat",
+  leaveDjSeat = "leaveDjSeat",
+  skipDjTrack = "skipDjTrack",
+  userWasDisconnected = "userWasDisconnected",
+  addAvatarToDancefloor = "addAvatarToDancefloor",
+  sendNextTrackToPlay = "sendNextTrackToPlay",
+  playNextSong = "playNextSong",
+  sendInitialState = "sendInitialState",
+  sendSatisfaction = "sendSatisfaction",
+  startConnection = "startConnection",
+  userConnectionLost = "userConnectionLost",
+  userDisconnected = "user:disconnected",
+  wrongMessagePayload = "wrongMessagePayload",
+}
