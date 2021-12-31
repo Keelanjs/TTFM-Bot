@@ -7,6 +7,7 @@ import { Bot } from "./bot";
 import { getArgsFromMessage } from "./utils/getArgsFromMessage";
 import { BotMessages } from "./types";
 import { getUserProfile } from "./utils/getUserProfile";
+import { Bots, onConnectHandler } from "./commandsHandlers/onConnectHandler";
 
 void (async () => {
   const secrets = await getAWSSecrets<{
@@ -22,7 +23,7 @@ void (async () => {
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
   });
 
-  const bots = {};
+  const bots: Bots = {};
 
   for (let i = 0; i < botInstancesCount; i++) {
     const bot = await Bot.createBot(
@@ -49,21 +50,7 @@ void (async () => {
 
     switch (command) {
       case BotMessages.CONNECT:
-        if (!args || !args[0] || !args[1]) {
-          message.reply("Invalid command");
-          return;
-        }
-        message.reply("Bot is connecting...");
-
-        const [botNumber, roomSlug] = args;
-        bots[botNumber]
-          .connectToRoom(roomSlug, null)
-          .then(() => {
-            message.reply(`Bot-${botNumber} is connected to ${roomSlug}`);
-          })
-          .catch(() => {
-            message.reply("Cannot connect");
-          });
+        onConnectHandler(bots, message, args);
         break;
 
       case BotMessages.PLAY_PLAYLIST:
