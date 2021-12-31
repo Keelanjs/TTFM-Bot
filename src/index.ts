@@ -9,6 +9,7 @@ import { createBots } from "./utils/createBots";
 import { onPlayPlaylistHandler } from "./commandsHandlers/onPlayPlaylistHandler";
 import { onLeaveDjSeatHandler } from "./commandsHandlers/onLeaveDjSeatHandler";
 import { onDisconnectHandler } from "./commandsHandlers/onDisconnectHandler";
+import { onStatusHandler } from "./commandsHandlers/onStatusHandler";
 
 void (async () => {
   const { discord_token } = await getAWSSecrets<{
@@ -29,6 +30,10 @@ void (async () => {
     const { command, args } = getArgsFromMessage(message);
 
     switch (command) {
+      case BotMessages.STATUS:
+        onStatusHandler(bots, message);
+        break;
+
       case BotMessages.CONNECT:
         onConnectHandler(bots, message, args);
         break;

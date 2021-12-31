@@ -3,6 +3,7 @@ export enum BotMessages {
   PLAY_PLAYLIST = "playplaylist",
   LEAVE_DJ_SEAT = "leavedj",
   DISCONNECT = "disconnect",
+  STATUS = "status",
 }
 
 export type Song = {

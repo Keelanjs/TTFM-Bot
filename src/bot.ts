@@ -22,6 +22,7 @@ export class Bot {
   private socket: Socket | undefined;
   private playingUserUuids: (string | null)[] | [] = [];
   private djSeatNumber: number | null = null;
+  public roomSlug: string | undefined;
 
   private constructor(
     io,
@@ -227,6 +228,8 @@ export class Bot {
       roomConfig.socketPath,
       roomPassword
     );
+
+    this.roomSlug = roomSlug;
   }
 
   public async disconnectFromRoom(): Promise<boolean> {
@@ -235,6 +238,8 @@ export class Bot {
     await this.delay(1000);
 
     const isClosed = await this.close();
+
+    this.roomSlug = undefined;
 
     return isClosed;
   }
