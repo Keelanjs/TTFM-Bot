@@ -6,6 +6,7 @@ import { getArgsFromMessage } from "./utils/getArgsFromMessage";
 import { BotMessages } from "./types";
 import { onConnectHandler } from "./commandsHandlers/onConnectHandler";
 import { createBots } from "./utils/createBots";
+import { onPlayPlaylistHandler } from "./commandsHandlers/onPlayPlaylistHandler";
 
 void (async () => {
   const { discord_token } = await getAWSSecrets<{
@@ -25,31 +26,13 @@ void (async () => {
   client.on("messageCreate", (message: Message) => {
     const { command, args } = getArgsFromMessage(message);
 
-    if (!command) {
-      return;
-    }
-
     switch (command) {
       case BotMessages.CONNECT:
         onConnectHandler(bots, message, args);
         break;
 
       case BotMessages.PLAY_PLAYLIST:
-        if (!args || !args[0] || !args[1] || !args[2]) {
-          message.reply("Invalid command");
-          return;
-        }
-        message.reply("Fetching playlist...");
-
-        const [bnumber, playlistId, DjSeatNumber] = args;
-        bots[bnumber]
-          .playPlaylist(playlistId, DjSeatNumber)
-          .then(() => {
-            message.reply(`Playing playlist to ${playlistId}`);
-          })
-          .catch(() => {
-            message.reply("Cannot play");
-          });
+        onPlayPlaylistHandler(bots, message, args);
         break;
 
       default:

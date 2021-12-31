@@ -6,7 +6,7 @@ export const onConnectHandler = (
   bots: IBots,
   message: Message,
   args: string[] | undefined
-) => {
+): void => {
   if (!args || args.length < 2) {
     message.reply("Invalid command");
 
