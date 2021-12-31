@@ -210,6 +210,8 @@ export class Bot {
     playlistId: string,
     djSeatNumber: string
   ): Promise<void> {
+    this.leaveDjSeat();
+
     const playlist = await fetchSpotifyPlaylist(
       playlistId,
       this.spotifyRefreshToken,
@@ -222,5 +224,10 @@ export class Bot {
     this.takeOrLeaveDjSeat();
 
     this.sendNextTrackToPlay();
+  }
+
+  public async leaveDjSeat(): Promise<void> {
+    this.djSeatNumber = null;
+    this.socket?.emit(SocketMessages.leaveDjSeat, { userUuid: this.botUuid });
   }
 }

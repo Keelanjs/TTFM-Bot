@@ -7,6 +7,7 @@ import { BotMessages } from "./types";
 import { onConnectHandler } from "./commandsHandlers/onConnectHandler";
 import { createBots } from "./utils/createBots";
 import { onPlayPlaylistHandler } from "./commandsHandlers/onPlayPlaylistHandler";
+import { onLeaveDjSeatHandler } from "./commandsHandlers/onLeaveDjSeatHandler";
 
 void (async () => {
   const { discord_token } = await getAWSSecrets<{
@@ -33,6 +34,10 @@ void (async () => {
 
       case BotMessages.PLAY_PLAYLIST:
         onPlayPlaylistHandler(bots, message, args);
+        break;
+
+      case BotMessages.LEAVE_DJ_SEAT:
+        onLeaveDjSeatHandler(bots, message, args);
         break;
 
       default:
