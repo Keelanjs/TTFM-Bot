@@ -1,12 +1,9 @@
 import { Message } from "discord.js";
-import { Bot } from "../bot";
 
-export interface Bots {
-  [key: string]: Bot;
-}
+import { IBots } from "../utils/createBots";
 
 export const onConnectHandler = (
-  bots: Bots,
+  bots: IBots,
   message: Message,
   args: string[] | undefined
 ) => {

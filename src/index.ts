@@ -1,41 +1,22 @@
 import { Client, Intents, Message } from "discord.js";
-import io from "socket.io-client";
 
 import { botInstancesCount, discordBotSecretsPath } from "./const";
 import { getAWSSecrets } from "./utils/getAWSSecrets";
-import { Bot } from "./bot";
 import { getArgsFromMessage } from "./utils/getArgsFromMessage";
 import { BotMessages } from "./types";
-import { getUserProfile } from "./utils/getUserProfile";
-import { Bots, onConnectHandler } from "./commandsHandlers/onConnectHandler";
+import { onConnectHandler } from "./commandsHandlers/onConnectHandler";
+import { createBots } from "./utils/createBots";
 
 void (async () => {
-  const secrets = await getAWSSecrets<{
+  const { discord_token } = await getAWSSecrets<{
     discord_token: string;
-    auth_bot_token: string;
-    spotify_refresh_token: string;
-    spotify_credentials: string;
   }>(discordBotSecretsPath);
 
-  const profile = await getUserProfile(secrets.auth_bot_token);
+  const bots = await createBots(botInstancesCount);
 
   const client = new Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
   });
-
-  const bots: Bots = {};
-
-  for (let i = 0; i < botInstancesCount; i++) {
-    const bot = await Bot.createBot(
-      io,
-      secrets.auth_bot_token,
-      secrets.spotify_refresh_token,
-      secrets.spotify_credentials,
-      profile.avatarId,
-      profile.uuid
-    );
-    bots[i] = bot;
-  }
 
   client.once("ready", () => {
     console.log("Bot is ready");
@@ -76,5 +57,5 @@ void (async () => {
     }
   });
 
-  client.login(secrets.discord_token);
+  client.login(discord_token);
 })();
