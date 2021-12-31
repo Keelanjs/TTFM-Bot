@@ -1,17 +1,15 @@
 import { Message } from "discord.js";
-import { botInstancesCount } from "../const";
 
 import { IBots } from "../utils/createBots";
 
 export const onStatusHandler = (bots: IBots, message: Message): void => {
   let statusMessage = "*\n";
-  const botsCount = Object.keys(bots).length;
 
-  for (let i = 1; i <= botsCount; i++) {
-    if (bots[i].roomSlug) {
-      statusMessage = `${statusMessage} Bot-${i} connected to ${bots[i].roomSlug}\n`;
+  for (const [botId, bot] of Object.entries(bots)) {
+    if (bot.roomSlug) {
+      statusMessage = `${statusMessage} Bot-${botId} connected to ${bot.roomSlug}\n`;
     } else {
-      statusMessage = `${statusMessage} Bot-${i} disconnected\n`;
+      statusMessage = `${statusMessage} Bot-${botId} disconnected\n`;
     }
   }
 
