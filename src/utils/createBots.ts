@@ -20,7 +20,7 @@ export const createBots = async (botInstancesCount: number): Promise<IBots> => {
 
   const bots: IBots = {};
 
-  for (let i = 0; i < botInstancesCount; i++) {
+  for (let i = 1; i <= botInstancesCount; i++) {
     const bot = await Bot.createBot(
       io,
       secrets.auth_bot_token,
