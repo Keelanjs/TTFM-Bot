@@ -1,4 +1,4 @@
-import { Socket } from "socket.io-client";
+import { Socket, io } from "socket.io-client";
 
 import {
   IInitialStateReceived,
@@ -10,8 +10,10 @@ import {
 import { fetchSpotifyPlaylist } from "./utils/fetchSpotifyPlaylist";
 import { getRoomConfigForClient } from "./utils/getRoomConfigForClient";
 
+type Io = typeof io;
+
 export class Bot {
-  private readonly io: any;
+  private readonly io: Io;
   public accessToken: string;
   private spotifyRefreshToken: string;
   private spotifyCredentials: string;
@@ -25,7 +27,7 @@ export class Bot {
   public roomSlug: string | undefined;
 
   private constructor(
-    io,
+    io: Io,
     accessToken: string,
     spotifyRefreshToken: string,
     spotifyCredentials: string,
@@ -41,7 +43,7 @@ export class Bot {
   }
 
   public static async createBot(
-    io,
+    io: Io,
     accessToken: string,
     spotifyRefreshToken: string,
     spotifyCredentials: string,
@@ -166,7 +168,6 @@ export class Bot {
 
       this.socket.io.reconnection(false);
       this.socket.close();
-      this.io.Socket.close();
     });
   }
 
