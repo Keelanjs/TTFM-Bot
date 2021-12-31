@@ -1,5 +1,7 @@
 import fetch from "node-fetch";
 
+import { ISpotifyPlaylist } from "../types";
+
 const getSpotifyAccessToken = async (
   spotifyRefreshToken: string,
   spotifyCredentials: string
@@ -27,7 +29,7 @@ export const fetchSpotifyPlaylist = async (
   playlistId: string,
   spotifyRefreshToken: string,
   spotifyCredentials: string
-) => {
+): Promise<ISpotifyPlaylist | undefined> => {
   try {
     const token = await getSpotifyAccessToken(
       spotifyRefreshToken,

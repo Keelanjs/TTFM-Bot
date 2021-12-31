@@ -59,3 +59,21 @@ export interface ITakeDjSeat {
 export interface ILeaveDjSeat {
   userUuid: string;
 }
+
+export interface ISpotifyPlaylist {
+  tracks: {
+    items: [
+      {
+        track: {
+          artists: [{ name: string }];
+          duration_ms: number;
+          id: string;
+          external_ids: {
+            isrc: string;
+          };
+          name: string;
+        };
+      }
+    ];
+  };
+}
