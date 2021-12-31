@@ -6,6 +6,7 @@ import { getAWSSecrets } from "./utils/getAWSSecrets";
 import { Bot } from "./bot";
 import { getArgsFromMessage } from "./utils/getArgsFromMessage";
 import { BotMessages } from "./types";
+import { getUserProfile } from "./utils/getUserProfile";
 
 void (async () => {
   const secrets = await getAWSSecrets<{
@@ -14,6 +15,8 @@ void (async () => {
     spotify_refresh_token: string;
     spotify_credentials: string;
   }>(discordBotSecretsPath);
+
+  const profile = await getUserProfile(secrets.auth_bot_token);
 
   const client = new Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
@@ -26,7 +29,9 @@ void (async () => {
       io,
       secrets.auth_bot_token,
       secrets.spotify_refresh_token,
-      secrets.spotify_credentials
+      secrets.spotify_credentials,
+      profile.avatarId,
+      profile.uuid
     );
     bots[i] = bot;
   }

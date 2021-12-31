@@ -5,9 +5,12 @@ import { getRoomConfigForClient } from "./utils/getRoomConfigForClient";
 
 export class Bot {
   private readonly io: any;
-  private spotifyRefreshToken: string = "";
-  private spotifyCredentials: string = "";
-  public accessToken: string = "";
+  public accessToken: string;
+  private spotifyRefreshToken: string;
+  private spotifyCredentials: string;
+  private avatarId: string;
+  private botUuid: string;
+
   private songs: Song[] = [];
   private socket: Socket | undefined = undefined;
 
@@ -15,12 +18,16 @@ export class Bot {
     io,
     accessToken: string,
     spotifyRefreshToken: string,
-    spotifyCredentials: string
+    spotifyCredentials: string,
+    avatarId: string,
+    botUuid: string
   ) {
     this.io = io;
     this.accessToken = accessToken;
     this.spotifyRefreshToken = spotifyRefreshToken;
     this.spotifyCredentials = spotifyCredentials;
+    this.avatarId = avatarId;
+    this.botUuid = botUuid;
   }
 
   public async connectToRoom(
@@ -44,14 +51,19 @@ export class Bot {
     io,
     accessToken: string,
     spotifyRefreshToken: string,
-    spotifyCredentials: string
+    spotifyCredentials: string,
+    avatarId: string,
+    botUuid: string
   ): Promise<Bot> {
     const _bot = new Bot(
       io,
       accessToken,
       spotifyRefreshToken,
-      spotifyCredentials
+      spotifyCredentials,
+      avatarId,
+      botUuid
     );
+
     return _bot;
   }
 
@@ -117,10 +129,9 @@ export class Bot {
     this.songs = this.getSongsFromPlaylist(playlist);
 
     this.socket?.emit("takeDjSeat", {
-      avatarId: "5",
+      avatarId: this.avatarId,
       djSeatKey: Number(DjSeatNumber),
       nextTrack: { song: this.songs[0] },
-      nickname: "Dj",
     });
   }
 }
