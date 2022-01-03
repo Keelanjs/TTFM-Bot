@@ -85,5 +85,6 @@ describe("Bot tests", () => {
     });
 
     expect(botState.getState().roomSlug).toBe(roomSlug);
+    expect(botState.getState().socket).not.toBeUndefined();
   });
 });

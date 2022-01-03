@@ -21,7 +21,6 @@ export class Bot {
   private spotifyCredentials: string;
   private avatarId: string;
   private botUuid: string;
-  private socket: Socket | undefined;
 
   public botState: BotState;
 
@@ -110,7 +109,9 @@ export class Bot {
     if (shouldStayOnStage) {
       this.takeDjSeat();
     } else {
-      this.socket?.emit(SocketMessages.leaveDjSeat, { userUuid: this.botUuid });
+      this.botState.socket?.emit(SocketMessages.leaveDjSeat, {
+        userUuid: this.botUuid,
+      });
     }
   }
 
@@ -143,7 +144,7 @@ export class Bot {
     return new Promise((resolve, _reject) => {
       socket.on("connect", () => {
         console.info("Connected in client");
-        this.socket = socket;
+        this.botState.setSocket(socket);
         resolve({ connected: true });
       });
 
@@ -155,18 +156,18 @@ export class Bot {
 
   private async close(): Promise<boolean> {
     return new Promise((resolveClose, _reject) => {
-      this.socket?.on("disconnect", () => {
+      this.botState.socket?.on("disconnect", () => {
         resolveClose(true);
-        this.socket = undefined;
+        this.botState.socket = undefined;
         console.log("Connection closed");
       });
 
-      if (!this.socket) {
+      if (!this.botState.socket) {
         return;
       }
 
-      this.socket.io.reconnection(false);
-      this.socket.close();
+      this.botState.socket.io.reconnection(false);
+      this.botState.socket.close();
     });
   }
 
@@ -182,7 +183,7 @@ export class Bot {
       trackUrl: "",
     };
 
-    this.socket?.emit(SocketMessages.sendNextTrackToPlay, nextTrack);
+    this.botState.socket?.emit(SocketMessages.sendNextTrackToPlay, nextTrack);
   }
 
   private getSongsFromPlaylist(playlist: ISpotifyPlaylist): Song[] {
@@ -205,7 +206,7 @@ export class Bot {
   }
 
   private takeDjSeat(): void {
-    this.socket?.emit(SocketMessages.takeDjSeat, {
+    this.botState.socket?.emit(SocketMessages.takeDjSeat, {
       avatarId: this.avatarId,
       djSeatKey: this.botState.djSeatNumber,
       nextTrack: { song: this.botState.songs[0] },
@@ -270,6 +271,8 @@ export class Bot {
 
   public async leaveDjSeat(): Promise<void> {
     this.botState.setDjSeatNumber(null);
-    this.socket?.emit(SocketMessages.leaveDjSeat, { userUuid: this.botUuid });
+    this.botState.socket?.emit(SocketMessages.leaveDjSeat, {
+      userUuid: this.botUuid,
+    });
   }
 }
