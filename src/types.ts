@@ -60,20 +60,19 @@ export interface ILeaveDjSeat {
   userUuid: string;
 }
 
+export interface ISpotifyTrack {
+  track: {
+    artists: [{ name: string }];
+    duration_ms: number;
+    id: string;
+    external_ids: {
+      isrc: string;
+    };
+    name: string;
+  };
+}
 export interface ISpotifyPlaylist {
   tracks: {
-    items: [
-      {
-        track: {
-          artists: [{ name: string }];
-          duration_ms: number;
-          id: string;
-          external_ids: {
-            isrc: string;
-          };
-          name: string;
-        };
-      }
-    ];
+    items: ISpotifyTrack[];
   };
 }
