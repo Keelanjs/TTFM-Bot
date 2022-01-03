@@ -22,7 +22,7 @@ export const createBots = async (botInstancesCount: number): Promise<IBots> => {
   const bots: IBots = {};
 
   for (let i = 1; i <= botInstancesCount; i++) {
-    const bot = await Bot.createBot(
+    const bot = Bot.createBot(
       io,
       secrets.auth_bot_token,
       secrets.spotify_refresh_token,

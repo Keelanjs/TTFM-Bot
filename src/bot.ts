@@ -12,7 +12,7 @@ import {
 import { fetchSpotifyPlaylist } from "./utils/fetchSpotifyPlaylist";
 import { getRoomConfigForClient } from "./utils/getRoomConfigForClient";
 
-type Io = typeof io;
+export type Io = typeof io;
 
 export class Bot {
   private readonly io: Io;
@@ -43,7 +43,7 @@ export class Bot {
     this.botState = botState;
   }
 
-  public static async createBot(
+  public static createBot(
     io: Io,
     accessToken: string,
     spotifyRefreshToken: string,
@@ -51,7 +51,7 @@ export class Bot {
     avatarId: string,
     botUuid: string,
     botState: BotState
-  ): Promise<Bot> {
+  ): Bot {
     const _bot = new Bot(
       io,
       accessToken,
