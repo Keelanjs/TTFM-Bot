@@ -169,4 +169,22 @@ Array [
 ]
 `);
   });
+
+  test("should set DjSeat to null and emit leaveDjSeat msg", async () => {
+    botState.setState({
+      socket: socketMock as any as Socket,
+      roomSlug,
+      songs: [],
+      playingUserUuids: [],
+      djSeatNumber: 3,
+    });
+
+    await bot.leaveDjSeat();
+
+    expect(socketMock.emit).toBeCalledWith(SocketMessages.leaveDjSeat, {
+      userUuid: botUuid,
+    });
+
+    expect(botState.getState().djSeatNumber).toBeNull();
+  });
 });
