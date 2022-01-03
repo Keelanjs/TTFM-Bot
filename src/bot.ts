@@ -88,7 +88,7 @@ export class Bot {
 
   private setTakeDjSeatListener(socket: Socket): void {
     socket.on(SocketMessages.takeDjSeat, (msg: ITakeDjSeat) => {
-      this.botState.addNewPlayingDj(msg);
+      this.botState.addNewPlayingDj(msg.userUuid);
 
       this.takeOrLeaveDjSeat();
     });
@@ -96,7 +96,7 @@ export class Bot {
 
   private setLeaveDjSeatListener(socket: Socket): void {
     socket.on(SocketMessages.leaveDjSeat, (msg: ILeaveDjSeat) => {
-      this.botState.removePlayingDj(msg);
+      this.botState.removePlayingDj(msg.userUuid);
 
       this.takeOrLeaveDjSeat();
     });

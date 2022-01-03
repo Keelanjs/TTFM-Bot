@@ -1,9 +1,4 @@
-import {
-  IInitialStateReceived,
-  ILeaveDjSeat,
-  ITakeDjSeat,
-  Song,
-} from "./types";
+import { IInitialStateReceived, Song } from "./types";
 
 export class BotState {
   public songs: Song[] = [];
@@ -27,13 +22,13 @@ export class BotState {
       .filter((a) => a);
   }
 
-  public addNewPlayingDj(msg: ITakeDjSeat): void {
-    this.playingUserUuids = [...this.playingUserUuids, msg.userUuid];
+  public addNewPlayingDj(botUuid: string): void {
+    this.playingUserUuids = [...this.playingUserUuids, botUuid];
   }
 
-  public removePlayingDj(msg: ILeaveDjSeat): void {
+  public removePlayingDj(botUuid: string): void {
     this.playingUserUuids = this.playingUserUuids.filter(
-      (item) => item !== msg.userUuid
+      (item) => item !== botUuid
     );
   }
 
