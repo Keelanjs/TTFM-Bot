@@ -115,7 +115,7 @@ export class Bot {
     }
   }
 
-  private configureListeners(socket: Socket): void {
+  configureListeners(socket: Socket): void {
     this.setPlayNextSongListener(socket);
     this.setSendInitialStateListener(socket);
     this.setTakeDjSeatListener(socket);
