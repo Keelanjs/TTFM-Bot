@@ -3,3 +3,6 @@ build:
 
 build-test-image:
 	docker build -t bot:test -f Dockerfile .	
+
+start-test-container:
+	docker-compose -f docker-compose.test-image.yaml up
