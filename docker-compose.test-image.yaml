@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   bot-image:
-    image: bot:test
+    image: 036958288468.dkr.ecr.us-east-2.amazonaws.com/turntable/discord-bot:latest
     user: node
     volumes:
       - .:/app
