@@ -1,10 +1,10 @@
 import { Bot, Io } from "../bot";
 import fetch from "node-fetch";
 import EventEmitter from "events";
+import { Socket } from "socket.io-client";
 
 import { mockedSpotifyResponse } from "./mocks/mockedSpotifyResponse";
 import { SocketMessages } from "../types";
-import { Socket } from "socket.io-client";
 import { songMock_1 } from "./mocks/songMock";
 import { initialStateReceivedMock, userUuid_1 } from "./mocks/initialStateMock";
 import { BotStateTestsWrapper } from "./helpers/BotStateTestsWrapper";
