@@ -1,4 +1,6 @@
-import { BotState } from "../botState";
+import { Socket } from "socket.io-client";
+
+import { BotTestState } from "./mocks/botTestState";
 import {
   initialStateReceivedMock,
   userUuid_1,
@@ -7,10 +9,10 @@ import {
 import { songMock_1, songMock_2 } from "./mocks/songMock";
 
 describe("Bot state tests", () => {
-  let botState: BotState;
+  let botState: BotTestState;
 
   beforeEach(() => {
-    botState = new BotState();
+    botState = new BotTestState();
   });
 
   it("shoud set songs", () => {
@@ -82,5 +84,53 @@ Object {
 
     expect(botState.playingUserUuids).toHaveLength(1);
     expect(botState.playingUserUuids).toContain(userUuid_2);
+  });
+
+  it("checkIfShouldStayOnStage should return false", () => {
+    const botUuid = userUuid_1;
+    botState.setInitialState(initialStateReceivedMock);
+    expect(botState.playingUserUuids).toHaveLength(2);
+
+    const shouldStayOnStage = botState.checkIfShouldStayOnStage(botUuid);
+
+    expect(shouldStayOnStage).toBeFalsy();
+  });
+
+  it("checkIfShouldStayOnStage should return true", () => {
+    const botUuid = userUuid_1;
+    botState.setState({
+      socket: undefined,
+      roomSlug: "test-slug",
+      songs: [],
+      playingUserUuids: [botUuid],
+      djSeatNumber: 0,
+    });
+
+    expect(botState.playingUserUuids).toHaveLength(1);
+
+    const shouldStayOnStage = botState.checkIfShouldStayOnStage(botUuid);
+
+    expect(shouldStayOnStage).toBeTruthy();
+  });
+
+  it("should set DjSeatNumber", () => {
+    const seatNumberStr = "1";
+    botState.setDjSeatNumber(seatNumberStr);
+
+    expect(botState.djSeatNumber).toBe(Number(seatNumberStr));
+  });
+
+  it("should set roomSlug", () => {
+    const roomSlug = "test-room-slug";
+    botState.setRoomSlug(roomSlug);
+
+    expect(botState.roomSlug).toBe(roomSlug);
+  });
+
+  it("should set socket", () => {
+    const socket = {} as Socket;
+    botState.setSocket(socket);
+
+    expect(botState.socket).toBe(socket);
   });
 });
