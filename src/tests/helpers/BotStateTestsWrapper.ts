@@ -9,7 +9,7 @@ export interface IBotTestState {
   roomSlug: string | undefined;
   socket: Socket | undefined;
 }
-export class BotTestState extends BotState {
+export class BotStateTestsWrapper extends BotState {
   public setState(state: IBotTestState) {
     this.songs = state.songs;
     this.playingUserUuids = state.playingUserUuids;

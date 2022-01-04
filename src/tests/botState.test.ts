@@ -1,6 +1,6 @@
 import { Socket } from "socket.io-client";
+import { BotStateTestsWrapper } from "./helpers/BotStateTestsWrapper";
 
-import { BotTestState } from "./mocks/botTestState";
 import {
   initialStateReceivedMock,
   userUuid_1,
@@ -9,10 +9,10 @@ import {
 import { songMock_1, songMock_2 } from "./mocks/songMock";
 
 describe("Bot state tests", () => {
-  let botState: BotTestState;
+  let botState: BotStateTestsWrapper;
 
   beforeEach(() => {
-    botState = new BotTestState();
+    botState = new BotStateTestsWrapper();
   });
 
   it("shoud set songs", () => {

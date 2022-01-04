@@ -2,12 +2,12 @@ import { Bot, Io } from "../bot";
 import fetch from "node-fetch";
 import EventEmitter from "events";
 
-import { BotTestState } from "./mocks/botTestState";
 import { mockedSpotifyResponse } from "./mocks/mockedSpotifyResponse";
 import { SocketMessages } from "../types";
 import { Socket } from "socket.io-client";
 import { songMock_1 } from "./mocks/songMock";
 import { initialStateReceivedMock, userUuid_1 } from "./mocks/initialStateMock";
+import { BotStateTestsWrapper } from "./helpers/BotStateTestsWrapper";
 
 jest.mock("node-fetch", () => jest.fn());
 
@@ -23,7 +23,7 @@ const io = jest.fn(() => socketMock) as any as Io;
 
 describe("Bot tests", () => {
   let bot: Bot;
-  let botState: BotTestState;
+  let botState: BotStateTestsWrapper;
   let eventEmitter: EventEmitter;
 
   const accessToken = "test-accessToken";
@@ -41,7 +41,7 @@ describe("Bot tests", () => {
   });
 
   beforeEach(() => {
-    botState = new BotTestState();
+    botState = new BotStateTestsWrapper();
 
     bot = Bot.createBot(
       io,
