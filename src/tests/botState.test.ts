@@ -99,7 +99,6 @@ Object {
   it("checkIfShouldStayOnStage should return true", () => {
     const botUuid = userUuid_1;
     botState.setState({
-      socket: undefined,
       roomSlug: "test-slug",
       songs: [],
       playingUserUuids: [botUuid],
@@ -125,12 +124,5 @@ Object {
     botState.setRoomSlug(roomSlug);
 
     expect(botState.roomSlug).toBe(roomSlug);
-  });
-
-  it("should set socket", () => {
-    const socket = {} as Socket;
-    botState.setSocket(socket);
-
-    expect(botState.socket).toBe(socket);
   });
 });

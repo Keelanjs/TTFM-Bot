@@ -98,7 +98,6 @@ describe("Bot tests", () => {
     });
 
     expect(botState.getState().roomSlug).toBe(roomSlug);
-    expect(botState.getState().socket).not.toBeUndefined();
   });
 
   test("should fetch playlist and emit playNextSong message", async () => {
@@ -108,8 +107,9 @@ describe("Bot tests", () => {
       })
     );
 
+    bot.setSocket(socketMock as unknown as Socket);
+
     botState.setState({
-      socket: socketMock as unknown as Socket,
       roomSlug,
       songs: [],
       playingUserUuids: [],
@@ -180,8 +180,8 @@ Array [
   });
 
   test("should set DjSeat to null and emit leaveDjSeat msg", async () => {
+    bot.setSocket(socketMock as unknown as Socket);
     botState.setState({
-      socket: socketMock as unknown as Socket,
       roomSlug,
       songs: [],
       playingUserUuids: [],
@@ -198,14 +198,13 @@ Array [
   });
 
   test("should emit sendNextTrackToPlay message", async () => {
+    bot.setSocket(socketMock as unknown as Socket);
     botState.setState({
-      socket: socketMock as unknown as Socket,
       roomSlug,
       songs: [songMock_1],
       playingUserUuids: [],
       djSeatNumber: 3,
     });
-
     bot.configureListeners(eventEmitter as unknown as Socket);
 
     eventEmitter.emit(SocketMessages.playNextSong);
@@ -221,14 +220,13 @@ Array [
   });
 
   test("should set initial state", async () => {
+    bot.setSocket(socketMock as unknown as Socket);
     botState.setState({
-      socket: socketMock as unknown as Socket,
       roomSlug,
       songs: [],
       playingUserUuids: [],
       djSeatNumber: null,
     });
-
     bot.configureListeners(eventEmitter as unknown as Socket);
 
     eventEmitter.emit(
@@ -247,14 +245,13 @@ Array [
   });
 
   test("bot should leave the stage when someone starts playing", async () => {
+    bot.setSocket(socketMock as unknown as Socket);
     botState.setState({
-      socket: socketMock as unknown as Socket,
       roomSlug,
       songs: [songMock_1],
       playingUserUuids: [],
       djSeatNumber: 1,
     });
-
     bot.configureListeners(eventEmitter as unknown as Socket);
 
     eventEmitter.emit(SocketMessages.takeDjSeat, { userUuid: userUuid_1 });
@@ -277,14 +274,13 @@ Array [
   });
 
   test("bot should start playing when the stage is empty", async () => {
+    bot.setSocket(socketMock as unknown as Socket);
     botState.setState({
-      socket: socketMock as unknown as Socket,
       roomSlug,
       songs: [songMock_1],
       playingUserUuids: [userUuid_1],
       djSeatNumber: 1,
     });
-
     bot.configureListeners(eventEmitter as unknown as Socket);
 
     eventEmitter.emit(SocketMessages.leaveDjSeat, { userUuid: userUuid_1 });

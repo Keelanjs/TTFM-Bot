@@ -6,7 +6,6 @@ export class BotState {
   public playingUserUuids: (string | null)[] | [] = [];
   public djSeatNumber: number | null = null;
   public roomSlug: string | undefined;
-  public socket: Socket | undefined;
 
   public setSongs(songs: Song[]): void {
     this.songs = songs;
@@ -50,9 +49,5 @@ export class BotState {
 
   public setRoomSlug(roomSlug: string | undefined): void {
     this.roomSlug = roomSlug;
-  }
-
-  public setSocket(socket: Socket | undefined) {
-    this.socket = socket;
   }
 }
