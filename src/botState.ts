@@ -1,3 +1,4 @@
+import { Socket } from "socket.io-client";
 import { IInitialStateReceived, Song } from "./types";
 
 export class BotState {

@@ -12,7 +12,7 @@ import {
 import { fetchSpotifyPlaylist } from "./utils/fetchSpotifyPlaylist";
 import { getRoomConfigForClient } from "./utils/getRoomConfigForClient";
 
-type Io = typeof io;
+export type Io = typeof io;
 
 export class Bot {
   private readonly io: Io;
@@ -43,7 +43,7 @@ export class Bot {
     this.botState = botState;
   }
 
-  public static async createBot(
+  public static createBot(
     io: Io,
     accessToken: string,
     spotifyRefreshToken: string,
@@ -51,7 +51,7 @@ export class Bot {
     avatarId: string,
     botUuid: string,
     botState: BotState
-  ): Promise<Bot> {
+  ): Bot {
     const _bot = new Bot(
       io,
       accessToken,
@@ -110,15 +110,21 @@ export class Bot {
     if (shouldStayOnStage) {
       this.takeDjSeat();
     } else {
-      this.socket?.emit(SocketMessages.leaveDjSeat, { userUuid: this.botUuid });
+      this.socket?.emit(SocketMessages.leaveDjSeat, {
+        userUuid: this.botUuid,
+      });
     }
   }
 
-  private configureListeners(socket: Socket): void {
+  configureListeners(socket: Socket): void {
     this.setPlayNextSongListener(socket);
     this.setSendInitialStateListener(socket);
     this.setTakeDjSeatListener(socket);
     this.setLeaveDjSeatListener(socket);
+  }
+
+  setSocket(socket: Socket | undefined): void {
+    this.socket = socket;
   }
 
   public async connect(
@@ -143,7 +149,7 @@ export class Bot {
     return new Promise((resolve, _reject) => {
       socket.on("connect", () => {
         console.info("Connected in client");
-        this.socket = socket;
+        this.setSocket(socket);
         resolve({ connected: true });
       });
 
@@ -157,7 +163,7 @@ export class Bot {
     return new Promise((resolveClose, _reject) => {
       this.socket?.on("disconnect", () => {
         resolveClose(true);
-        this.socket = undefined;
+        this.setSocket(undefined);
         console.log("Connection closed");
       });
 
@@ -270,6 +276,8 @@ export class Bot {
 
   public async leaveDjSeat(): Promise<void> {
     this.botState.setDjSeatNumber(null);
-    this.socket?.emit(SocketMessages.leaveDjSeat, { userUuid: this.botUuid });
+    this.socket?.emit(SocketMessages.leaveDjSeat, {
+      userUuid: this.botUuid,
+    });
   }
 }

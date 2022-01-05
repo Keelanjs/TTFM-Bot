@@ -4,12 +4,16 @@
   "description": "discord bot",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node ./src/index.ts"
+    "start": "ts-node ./src/index.ts",
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/jest": "^27.4.0",
     "@types/node": "^16.11.1",
+    "jest": "^27.4.5",
+    "ts-jest": "^27.1.2",
     "ts-node": "^10.3.0",
     "typescript": "^4.4.4"
   },
