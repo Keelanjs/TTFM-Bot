@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-exec node dist/index.js
+exec node dist/src/index.js
