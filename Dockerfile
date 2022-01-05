@@ -10,6 +10,5 @@ RUN apt-get update \
 ADD ${bundle} /tmp
 RUN mkdir -p /app
 WORKDIR /app
-ADD entrypoint.sh /app
 RUN unzip -q /tmp/${bundle}
 ENTRYPOINT [ "/app/entrypoint.sh" ]
