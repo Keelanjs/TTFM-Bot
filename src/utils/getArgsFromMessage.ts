@@ -9,7 +9,7 @@ interface IGetArgs {
 }
 
 export const getArgsFromMessage = (message: Message): IGetArgs => {
-  if (!message.content.startsWith(commandPrefix || message.author.bot)) {
+  if (!message.content.startsWith(commandPrefix) || message.author.bot) {
     return {
       command: undefined,
       args: undefined,
