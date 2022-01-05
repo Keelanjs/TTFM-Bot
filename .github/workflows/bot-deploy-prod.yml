@@ -1,0 +1,61 @@
+name: "Deploy discord bot to production"
+
+on:
+  push:
+    tags:
+      - "v*"
+
+env:
+  NODE_VERSION: 16.13.1
+  ENV: production
+  ECR_BASE: 829838608284.dkr.ecr.us-east-2.amazonaws.com/turntable/discord-bot
+  AWS_EC2_METADATA_DISABLED: true
+  REGION: us-east-2
+
+jobs:
+  bot_deploy:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v2.3.1
+        with:
+          persist-credentials: false
+
+      - name: "Use Node.js v${{ env.NODE_VERSION }}"
+        uses: actions/setup-node@master
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Cache NPM dependencies
+        uses: actions/cache@v1
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+          key: ${{ runner.OS }}-npm-cache-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-npm-cache-
+
+      - name: Install node dependencies
+        run: npm ci
+
+      - name: Install additional dependencies
+        run: npm install -g node-lambda
+
+      - name: Create zip bundle
+        run: |
+          npm run build 
+          node-lambda zip -n bot -A .
+
+      - name: "Build ECR images"
+        run: |
+          docker build -t ${ECR_BASE}:latest -f Dockerfile .
+
+      - name: "Push images to ECR"
+        run: |
+          aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $ECR_BASE
+          docker push ${ECR_BASE}:latest
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_PRODUCTION }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_PRODUCTION }}
