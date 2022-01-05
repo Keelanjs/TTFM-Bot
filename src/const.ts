@@ -3,5 +3,5 @@ export const roomsServiceApiBaseUrl =
   process.env.ROOMS_SERVICE_API_BASE_URL || "";
 export const userServiceApiBaseUrl =
   process.env.USER_SERVICE_API_BASE_URL || "";
-export const botInstancesCount = 10;
+export const botInstancesCount = 20;
 export const commandPrefix = "!";
