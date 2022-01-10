@@ -244,7 +244,9 @@ export class Bot {
 
   public async disconnectFromRoom(): Promise<boolean> {
     this.leaveDjSeat();
-    await this.delay(1000);
+    if (process.env.NODE_ENV !== "test") {
+      await this.delay(1000);
+    }
 
     const isClosed = await this.close();
     this.botState.setRoomSlug(undefined);
@@ -256,6 +258,10 @@ export class Bot {
     playlistId: string,
     djSeatNumber: string
   ): Promise<void> {
+    if (this.botState.roomSlug === undefined) {
+      throw new Error("Please connect to the room first");
+    }
+
     this.leaveDjSeat();
 
     const playlist = await fetchSpotifyPlaylist(

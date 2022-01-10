@@ -95,6 +95,9 @@ describe("Bot tests", () => {
           },
         },
       },
+      reconnection: true,
+      reconnectionAttempts: 7,
+      reconnectionDelay: 5000,
     });
 
     expect(botState.getState().roomSlug).toBe(roomSlug);

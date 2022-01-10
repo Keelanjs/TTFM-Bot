@@ -20,7 +20,7 @@ export const onPlayPlaylistHandler = (
     .then(() => {
       message.reply(`Playing playlist ${playlistId}`);
     })
-    .catch(() => {
-      message.reply("Cannot play");
+    .catch((e) => {
+      message.reply(e.message);
     });
 };
