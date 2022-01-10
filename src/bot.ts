@@ -142,11 +142,14 @@ export class Bot {
           },
         },
       },
+      reconnectionAttempts: 7,
+      reconnectionDelay: 5000,
+      reconnection: true,
     });
 
     this.configureListeners(socket);
 
-    return new Promise((resolve, _reject) => {
+    return new Promise((resolve, reject) => {
       socket.on("connect", () => {
         console.info("Connected in client");
         this.setSocket(socket);
@@ -155,6 +158,7 @@ export class Bot {
 
       socket.on("connect_error", (error: Error) => {
         console.log({ msg: "Error in Bot.connect", error });
+        reject(error.message);
       });
     });
   }
@@ -168,11 +172,11 @@ export class Bot {
       });
 
       if (!this.socket) {
-        return;
+        resolveClose(true);
       }
 
-      this.socket.io.reconnection(false);
-      this.socket.close();
+      this?.socket?.io.reconnection(false);
+      this?.socket?.close();
     });
   }
 
