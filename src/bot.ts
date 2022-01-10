@@ -226,7 +226,7 @@ export class Bot {
     roomSlug: string,
     roomPassword: string | null
   ): Promise<void> {
-    this.disconnectFromRoom();
+    await this.disconnectFromRoom();
     const roomConfig = await getRoomConfigForClient(roomSlug, this.accessToken);
 
     if (!roomConfig) {
