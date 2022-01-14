@@ -1,4 +1,5 @@
 import { Message } from "discord.js";
+import { checkBotKey } from "../utils/checkBotKey";
 
 import { IBots } from "../utils/createBots";
 
@@ -15,6 +16,13 @@ export const onPlayPlaylistHandler = (
   message.reply("Fetching playlist...");
 
   const [botNumber, playlistId, DjSeatNumber] = args;
+
+  const isValidKey = checkBotKey(botNumber, bots, message);
+
+  if (!isValidKey) {
+    return;
+  }
+
   bots[botNumber]
     .playPlaylist(playlistId, DjSeatNumber)
     .then(() => {
