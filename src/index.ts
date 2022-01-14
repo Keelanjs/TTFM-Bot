@@ -11,6 +11,7 @@ import { onLeaveDjSeatHandler } from "./commandsHandlers/onLeaveDjSeatHandler";
 import { onDisconnectHandler } from "./commandsHandlers/onDisconnectHandler";
 import { onStatusHandler } from "./commandsHandlers/onStatusHandler";
 import { onChangeModeHandler } from "./commandsHandlers/onChangeModeHandler";
+import { onTakeSeatHandler } from "./commandsHandlers/onTakeSeatHandler";
 
 void (async () => {
   const { discord_token } = await getAWSSecrets<{
@@ -53,6 +54,10 @@ void (async () => {
 
       case BotMessages.CHANGE_MODE:
         onChangeModeHandler(bots, message, args);
+        break;
+
+      case BotMessages.TAKE_DJ_SEAT:
+        onTakeSeatHandler(bots, message, args);
         break;
 
       default:

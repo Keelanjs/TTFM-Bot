@@ -218,14 +218,6 @@ export class Bot {
     return songs;
   }
 
-  private takeDjSeat(): void {
-    this.socket?.emit(SocketMessages.takeDjSeat, {
-      avatarId: this.avatarId,
-      djSeatKey: this.botState.djSeatNumber,
-      nextTrack: { song: this.botState.songs[0] },
-    });
-  }
-
   public async connectToRoom(
     roomSlug: string,
     roomPassword: string | null
@@ -283,7 +275,11 @@ export class Bot {
 
     this.botState.setDjSeatNumber(djSeatNumber);
 
-    this.takeOrLeaveDjSeat();
+    if (this.botState.getBotMode() === "testing") {
+      this.takeDjSeat();
+    } else {
+      this.takeOrLeaveDjSeat();
+    }
 
     this.sendNextTrackToPlay();
   }
@@ -292,6 +288,25 @@ export class Bot {
     this.botState.setDjSeatNumber(null);
     this.socket?.emit(SocketMessages.leaveDjSeat, {
       userUuid: this.botUuid,
+    });
+  }
+
+  public takeDjSeat(djSeatStr?: string): void {
+    if (djSeatStr) {
+      this.botState.setDjSeatNumber(djSeatStr);
+    }
+
+    const nextTrack =
+      this.botState.songs.length === 0
+        ? null
+        : {
+            song: this.botState.songs[0],
+          };
+
+    this.socket?.emit(SocketMessages.takeDjSeat, {
+      avatarId: this.avatarId,
+      djSeatKey: this.botState.djSeatNumber,
+      nextTrack,
     });
   }
 }

@@ -5,6 +5,7 @@ export enum BotMessages {
   DISCONNECT = "disconnect",
   STATUS = "status",
   CHANGE_MODE = "changemode",
+  TAKE_DJ_SEAT = "takedj",
 }
 
 export type Song = {

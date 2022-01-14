@@ -350,4 +350,50 @@ Array [
 
     expect(socketMock.emit).not.toHaveBeenCalled();
   });
+
+  test("should take dj seat, nextTrack shoud be null", async () => {
+    const djSeatToTake = "1";
+
+    bot.setSocket(socketMock as unknown as Socket);
+    botState.setState({
+      roomSlug,
+      songs: [],
+      playingUserUuids: [],
+      djSeatNumber: null,
+      botMode: "bot",
+    });
+
+    bot.takeDjSeat(djSeatToTake);
+
+    expect(socketMock.emit).toBeCalledWith(SocketMessages.takeDjSeat, {
+      avatarId,
+      djSeatKey: Number(djSeatToTake),
+      nextTrack: null,
+    });
+
+    expect(botState.getState().djSeatNumber).toBe(Number(djSeatToTake));
+  });
+
+  test("should take dj seat, song shouldn't be a null", async () => {
+    const djSeatToTake = "1";
+
+    bot.setSocket(socketMock as unknown as Socket);
+    botState.setState({
+      roomSlug,
+      songs: [songMock_1],
+      playingUserUuids: [],
+      djSeatNumber: null,
+      botMode: "bot",
+    });
+
+    bot.takeDjSeat(djSeatToTake);
+
+    expect(socketMock.emit).toBeCalledWith(SocketMessages.takeDjSeat, {
+      avatarId,
+      djSeatKey: Number(djSeatToTake),
+      nextTrack: {
+        song: songMock_1,
+      },
+    });
+  });
 });
