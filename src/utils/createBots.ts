@@ -5,6 +5,7 @@ import { BotState } from "../botState";
 import { discordBotSecretsPath } from "../const";
 import { getAWSSecrets } from "./getAWSSecrets";
 import { getUserProfile } from "./getUserProfile";
+import { logIn } from "./login";
 
 export interface IBots {
   [key: string]: Bot;
@@ -12,19 +13,25 @@ export interface IBots {
 
 export const createBots = async (botInstancesCount: number): Promise<IBots> => {
   const secrets = await getAWSSecrets<{
-    auth_bot_token: string;
     spotify_refresh_token: string;
     spotify_credentials: string;
+    email_base: string;
+    password: string;
   }>(discordBotSecretsPath);
-
-  const profile = await getUserProfile(secrets.auth_bot_token);
 
   const bots: IBots = {};
 
   for (let i = 1; i <= botInstancesCount; i++) {
+    const { accessToken } = await logIn({
+      email: `${secrets.email_base}${i}@tt.fm`,
+      password: secrets.password,
+    });
+
+    const profile = await getUserProfile(accessToken);
+
     const bot = Bot.createBot(
       io,
-      secrets.auth_bot_token,
+      accessToken,
       secrets.spotify_refresh_token,
       secrets.spotify_credentials,
       profile.avatarId,
