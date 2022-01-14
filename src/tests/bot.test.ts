@@ -117,6 +117,7 @@ describe("Bot tests", () => {
       songs: [],
       playingUserUuids: [],
       djSeatNumber: null,
+      botMode: "bot",
     });
 
     await bot.playPlaylist("playlist-id", djSeatNumber);
@@ -189,6 +190,7 @@ Array [
       songs: [],
       playingUserUuids: [],
       djSeatNumber: 3,
+      botMode: "bot",
     });
 
     await bot.leaveDjSeat();
@@ -207,6 +209,7 @@ Array [
       songs: [songMock_1],
       playingUserUuids: [],
       djSeatNumber: 3,
+      botMode: "bot",
     });
     bot.configureListeners(eventEmitter as unknown as Socket);
 
@@ -229,6 +232,7 @@ Array [
       songs: [],
       playingUserUuids: [],
       djSeatNumber: null,
+      botMode: "bot",
     });
     bot.configureListeners(eventEmitter as unknown as Socket);
 
@@ -254,6 +258,7 @@ Array [
       songs: [songMock_1],
       playingUserUuids: [],
       djSeatNumber: 1,
+      botMode: "bot",
     });
     bot.configureListeners(eventEmitter as unknown as Socket);
 
@@ -283,6 +288,7 @@ Array [
       songs: [songMock_1],
       playingUserUuids: [userUuid_1],
       djSeatNumber: 1,
+      botMode: "bot",
     });
     bot.configureListeners(eventEmitter as unknown as Socket);
 
@@ -300,5 +306,48 @@ Array [
         nextTrack: { song: songMock_1 },
       }
     );
+  });
+
+  test("bot in testing mode shouldn't leave the stage when someone starts playing", async () => {
+    bot.setSocket(socketMock as unknown as Socket);
+    botState.setState({
+      roomSlug,
+      songs: [songMock_1],
+      playingUserUuids: [],
+      djSeatNumber: 1,
+      botMode: "testing",
+    });
+    bot.configureListeners(eventEmitter as unknown as Socket);
+
+    eventEmitter.emit(SocketMessages.takeDjSeat, { userUuid: userUuid_1 });
+
+    const state = botState.getState();
+    expect(state.playingUserUuids).toHaveLength(1);
+    expect(state.playingUserUuids).toContain(
+      initialStateReceivedMock.djSeats.value[0][1].userUuid
+    );
+    expect(state.djSeatNumber).toBe(1);
+    expect(state.songs).toHaveLength(1);
+
+    expect(socketMock.emit).not.toHaveBeenCalled();
+  });
+
+  test("bot in testing mode shouldn't start playing when the stage is empty", async () => {
+    bot.setSocket(socketMock as unknown as Socket);
+    botState.setState({
+      roomSlug,
+      songs: [songMock_1],
+      playingUserUuids: [userUuid_1],
+      djSeatNumber: 1,
+      botMode: "testing",
+    });
+    bot.configureListeners(eventEmitter as unknown as Socket);
+
+    eventEmitter.emit(SocketMessages.leaveDjSeat, { userUuid: userUuid_1 });
+
+    const state = botState.getState();
+    expect(state.playingUserUuids).toHaveLength(0);
+
+    expect(socketMock.emit).not.toHaveBeenCalled();
   });
 });

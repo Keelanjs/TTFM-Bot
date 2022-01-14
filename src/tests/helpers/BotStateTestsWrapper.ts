@@ -1,12 +1,12 @@
-import { Socket } from "socket.io-client";
 import { BotState } from "../../botState";
-import { Song } from "../../types";
+import { BotMode, Song } from "../../types";
 
 export interface IBotTestState {
   songs: Song[] | [];
   playingUserUuids: (string | null)[];
   djSeatNumber: number | null;
   roomSlug: string | undefined;
+  botMode: BotMode;
 }
 export class BotStateTestsWrapper extends BotState {
   public setState(state: IBotTestState) {
@@ -14,6 +14,7 @@ export class BotStateTestsWrapper extends BotState {
     this.playingUserUuids = state.playingUserUuids;
     this.djSeatNumber = state.djSeatNumber;
     this.roomSlug = state.roomSlug;
+    this.botMode = state.botMode;
   }
 
   public getState(): IBotTestState {
@@ -22,6 +23,7 @@ export class BotStateTestsWrapper extends BotState {
       playingUserUuids: this.playingUserUuids,
       djSeatNumber: this.djSeatNumber,
       roomSlug: this.roomSlug,
+      botMode: this.botMode,
     };
   }
 }

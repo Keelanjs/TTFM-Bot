@@ -1,11 +1,11 @@
-import { Socket } from "socket.io-client";
-import { IInitialStateReceived, Song } from "./types";
+import { BotMode, IInitialStateReceived, Song } from "./types";
 
 export class BotState {
   public songs: Song[] = [];
   public playingUserUuids: (string | null)[] | [] = [];
   public djSeatNumber: number | null = null;
   public roomSlug: string | undefined;
+  public botMode: BotMode = "bot";
 
   public setSongs(songs: Song[]): void {
     this.songs = songs;
@@ -49,5 +49,13 @@ export class BotState {
 
   public setRoomSlug(roomSlug: string | undefined): void {
     this.roomSlug = roomSlug;
+  }
+
+  public setBotMode(botMode: BotMode): void {
+    this.botMode = botMode;
+  }
+
+  public getBotMode(): BotMode {
+    return this.botMode;
   }
 }

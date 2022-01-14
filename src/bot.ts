@@ -103,6 +103,10 @@ export class Bot {
   }
 
   private takeOrLeaveDjSeat(): void {
+    if (this.botState.getBotMode() === "testing") {
+      return;
+    }
+
     const shouldStayOnStage = this.botState.checkIfShouldStayOnStage(
       this.botUuid
     );

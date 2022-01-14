@@ -4,6 +4,7 @@ export enum BotMessages {
   LEAVE_DJ_SEAT = "leavedj",
   DISCONNECT = "disconnect",
   STATUS = "status",
+  CHANGE_MODE = "changemode",
 }
 
 export type Song = {
@@ -76,3 +77,5 @@ export interface ISpotifyPlaylist {
     items: ISpotifyTrack[];
   };
 }
+
+export type BotMode = "testing" | "bot";
