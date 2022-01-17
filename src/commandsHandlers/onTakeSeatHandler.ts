@@ -3,19 +3,18 @@ import { checkBotKey } from "../utils/checkBotKey";
 
 import { IBots } from "../utils/createBots";
 
-export const onPlayPlaylistHandler = (
+export const onTakeSeatHandler = (
   bots: IBots,
   message: Message,
   args: string[] | undefined
 ): void => {
-  if (!args || args.length < 3) {
+  if (!args || args.length < 2) {
     message.reply("Invalid command");
 
     return;
   }
-  message.reply("Fetching playlist...");
 
-  const [botNumber, playlistId, DjSeatNumber] = args;
+  const [botNumber, djSeatNumber] = args;
 
   const isValidKey = checkBotKey(botNumber, bots, message);
 
@@ -23,12 +22,7 @@ export const onPlayPlaylistHandler = (
     return;
   }
 
-  bots[botNumber]
-    .playPlaylist(playlistId, DjSeatNumber)
-    .then(() => {
-      message.reply(`Playing playlist ${playlistId}`);
-    })
-    .catch((e) => {
-      message.reply(e.message);
-    });
+  bots[botNumber].takeDjSeat(djSeatNumber);
+
+  message.reply(`Bot ${botNumber} taking seat: ${djSeatNumber}`);
 };

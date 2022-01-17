@@ -103,6 +103,7 @@ Object {
       songs: [],
       playingUserUuids: [botUuid],
       djSeatNumber: 0,
+      botMode: "bot",
     });
 
     expect(botState.playingUserUuids).toHaveLength(1);
